@@ -24,7 +24,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Great places',
         theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo)),
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.indigo, secondary: Colors.amber)),
         home: const PlacesScreen(),
         routes: {
           AddPlaceScreen.routName: (context) => const AddPlaceScreen(),
