@@ -11,8 +11,18 @@ class AddPlaceScreen extends StatefulWidget {
 }
 
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
+  final _titleController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add place'),
@@ -25,29 +35,29 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
-                  child: Form(
-                    child: Column(children: [
-                      TextFormField(
-                        decoration: InputDecoration(labelText: 'Title'),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      ImageInput(),
-                    ]),
-                  ),
+                  child: Column(children: [
+                    TextField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(labelText: 'Title'),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    const ImageInput(),
+                  ]),
                 ),
               ),
             ),
             ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    padding: EdgeInsets.only(top: 12, bottom: 12),
+                    foregroundColor: colorScheme.primary,
+                    backgroundColor: colorScheme.secondary,
+                    padding: const EdgeInsets.only(top: 12, bottom: 12),
                     elevation: 0,
-                    shape: ContinuousRectangleBorder()),
+                    shape: const ContinuousRectangleBorder()),
                 onPressed: () {},
-                icon: Icon(Icons.photo_size_select_actual_rounded),
-                label: Text('Add place'))
+                icon: const Icon(Icons.photo_size_select_actual_rounded),
+                label: const Text('Add place'))
           ]),
     );
   }
