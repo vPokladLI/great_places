@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/places_provider.dart';
 import '../widgets/image_input.dart';
 
 class AddPlaceScreen extends StatefulWidget {
@@ -12,6 +15,23 @@ class AddPlaceScreen extends StatefulWidget {
 
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
+  File? _pickedImage;
+
+  void selectImage(File pickedImage) {
+    _pickedImage = pickedImage;
+  }
+
+  void _onSubmit() {
+    if (_titleController.text.isEmpty || _pickedImage == null) {
+      return;
+    }
+    context.read<Places>().addItem(
+        title: _titleController.text,
+        latitude: 10,
+        longitude: 12,
+        image: _pickedImage!);
+    Navigator.of(context).pop();
+  }
 
   @override
   void dispose() {
@@ -43,7 +63,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                     const SizedBox(
                       height: 16,
                     ),
-                    const ImageInput(),
+                    ImageInput(selectImage),
                   ]),
                 ),
               ),
@@ -55,7 +75,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                     elevation: 0,
                     shape: const ContinuousRectangleBorder()),
-                onPressed: () {},
+                onPressed: _onSubmit,
                 icon: const Icon(Icons.photo_size_select_actual_rounded),
                 label: const Text('Add place'))
           ]),
