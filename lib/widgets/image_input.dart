@@ -21,10 +21,13 @@ class _ImageInputState extends State<ImageInput> {
     try {
       XFile? image =
           await _imagePicker.pickImage(source: source, maxWidth: 600);
+      if (image == null) {
+        return;
+      }
       final Directory appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
       setState(() {
-        _imageFIle = File(image!.path);
+        _imageFIle = File(image.path);
       });
       final imageFileName = path.basename(_imageFIle!.path);
       final appDocDir = appDocumentsDirectory.path;
