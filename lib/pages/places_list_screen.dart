@@ -23,6 +23,28 @@ class PlacesScreen extends StatelessWidget {
       ),
     );
 
+    Widget noItems = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'No item added yet! Start adding your favorite places',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          ElevatedButton.icon(
+              label: const Text('Add place'),
+              onPressed: () {
+                Navigator.of(context).pushNamed(AddPlaceScreen.routName);
+              },
+              icon: const Icon(Icons.add))
+        ],
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Great places'),
@@ -34,22 +56,111 @@ class PlacesScreen extends StatelessWidget {
               icon: const Icon(Icons.add))
         ],
       ),
-      body: Consumer<Places>(
-          child: Text('No items'),
-          builder: (context, places, ch) => places.items.isEmpty
-              ? ch!
-              : ListView.builder(
-                  itemCount: places.items.length,
-                  itemBuilder: (ctx, i) => ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: FileImage(places.items[i].image),
-                    ),
-                    title: Text(places.items[i].title),
-                    onTap: () {
-                      //TODO implement detailed view
-                    },
-                  ),
-                )),
+      body: FutureBuilder(
+        future: Provider.of<Places>(context, listen: false)
+            .fetchAndSeItems('places'),
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? spinner
+            : Consumer<Places>(
+                child: noItems,
+                builder: (context, places, ch) => places.items.isEmpty
+                    ? ch!
+                    : ListView.separated(
+                        separatorBuilder: (context, index) => const SizedBox(
+                          height: 20,
+                        ),
+                        itemCount: places.items.length,
+                        itemBuilder: (ctx, i) => Dismissible(
+                          background: Container(
+                            color: Colors.red,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'DELETE',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.white),
+                                ),
+                                SizedBox(
+                                  width: 15,
+                                )
+                              ],
+                            ),
+                          ),
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) {
+                            Provider.of<Places>(context, listen: false)
+                                .deletePlace(places.items[i].id);
+                          },
+                          confirmDismiss: (direction) {
+                            return showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Are you sure?'),
+                                content: const Text(
+                                    'Do yo want to remove this awesome place?'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: const Text('No, sorry!')),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text('Yep! Delete it!')),
+                                ],
+                              ),
+                            );
+                          },
+                          key: Key(places.items[i].id),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: FileImage(places.items[i].image),
+                            ),
+                            title: Text(places.items[i].title),
+                            onTap: () {
+                              //TODO implement detailed view
+                            },
+                            trailing: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Are you sure?'),
+                                      content: const Text(
+                                          'Do yo want to remove this awesome place?'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text('No, sorry!')),
+                                        TextButton(
+                                            onPressed: () {
+                                              Provider.of<Places>(context,
+                                                      listen: false)
+                                                  .deletePlace(
+                                                      places.items[i].id);
+                                              Navigator.of(context).pop();
+                                            },
+                                            child:
+                                                const Text('Yep! Delete it!')),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.delete)),
+                          ),
+                        ),
+                      )),
+      ),
     );
   }
 }

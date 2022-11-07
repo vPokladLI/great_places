@@ -54,11 +54,11 @@ class _ImageInputState extends State<ImageInput> {
                   fit: BoxFit.cover,
                   width: double.infinity,
                 )
-              : Text(
+              : const Text(
                   "No image",
                   textAlign: TextAlign.center,
                 )),
-      SizedBox(
+      const SizedBox(
         width: 8,
       ),
       Expanded(
@@ -69,22 +69,24 @@ class _ImageInputState extends State<ImageInput> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               TextButton.icon(
-                  style: TextButton.styleFrom(alignment: Alignment(-1, 0)),
+                  style:
+                      TextButton.styleFrom(alignment: const Alignment(-1, 0)),
                   onPressed: () {
                     _takePhoto(ImageSource.camera);
                   },
-                  icon: Icon(Icons.camera),
-                  label: Text(
+                  icon: const Icon(Icons.camera),
+                  label: const Text(
                     'Take photo',
                     textAlign: TextAlign.right,
                   )),
               TextButton.icon(
-                  style: TextButton.styleFrom(alignment: Alignment(-1, 0)),
+                  style:
+                      TextButton.styleFrom(alignment: const Alignment(-1, 0)),
                   onPressed: () {
                     _takePhoto(ImageSource.gallery);
                   },
-                  icon: Icon(Icons.upload_file),
-                  label: Text('Upload image')),
+                  icon: const Icon(Icons.upload_file),
+                  label: const Text('Upload image')),
             ],
           ),
         ),

@@ -30,6 +30,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
         latitude: 10,
         longitude: 12,
         image: _pickedImage!);
+
     Navigator.of(context).pop();
   }
 
