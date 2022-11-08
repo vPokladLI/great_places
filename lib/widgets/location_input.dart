@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
 import '../helpers/maps_helper.dart';
+import '../pages/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
   final Function selectLocation;
@@ -31,17 +32,44 @@ class _LocationInputState extends State<LocationInput> {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Attention!'),
+            content: const Text(
+                'Application needs yours permission to view location! Please confirm!'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Let`s try again.'))
+            ],
+          ),
+        );
         return;
       }
     }
     _locationData = await location.getLocation();
-    if (_locationData == null) return;
+    // if (_locationData == null) return;
     final mapImageUrl = MapsHelper.generateLocationPreview(
         _locationData.latitude!, _locationData.longitude!);
     widget.selectLocation(_locationData);
     setState(() {
       _previewLocation = mapImageUrl;
     });
+  }
+
+  Future<void> _selectOnMap() async {
+    final selectedLocation = await Navigator.of(context).push(MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (context) => const MapScreen(
+        isSelecting: true,
+      ),
+    ));
+    if (selectedLocation == null) {
+      return;
+    }
   }
 
   @override
@@ -55,7 +83,7 @@ class _LocationInputState extends State<LocationInput> {
           decoration: BoxDecoration(
               border: Border.all(color: Colors.black12, width: 1)),
           child: _previewLocation == null
-              ? Text(
+              ? const Text(
                   'No location is selected',
                   textAlign: TextAlign.center,
                 )
@@ -65,7 +93,7 @@ class _LocationInputState extends State<LocationInput> {
                   width: double.infinity,
                 ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Row(
@@ -75,12 +103,12 @@ class _LocationInputState extends State<LocationInput> {
                 onPressed: () {
                   _getLocation();
                 },
-                icon: Icon(Icons.location_on),
-                label: Text('Get user location')),
+                icon: const Icon(Icons.location_on),
+                label: const Text('Get user location')),
             TextButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.map),
-                label: Text('Select on map')),
+                onPressed: _selectOnMap,
+                icon: const Icon(Icons.map),
+                label: const Text('Select on map')),
           ],
         )
       ],
