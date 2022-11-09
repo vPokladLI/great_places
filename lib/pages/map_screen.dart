@@ -19,6 +19,13 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   LatLng? _selectedLocation;
 
+  // @override
+  // void initState() {
+  //   _selectedLocation = LatLng(
+  //       widget.initialLocation.latitude, widget.initialLocation.longitude);
+  //   super.initState();
+  // }
+
   void _selectLocation(LatLng? position) {
     if (position != null) {
       setState(() {
@@ -35,9 +42,20 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedLocation == null
-            ? '${widget.initialLocation.latitude}, ${widget.initialLocation.longitude}'
-            : '${_selectedLocation?.latitude.toStringAsFixed(2)},  ${_selectedLocation?.longitude.toStringAsFixed(2)}'),
+        title: SizedBox(
+          width: 70,
+          child: FittedBox(
+            child: Text(_selectedLocation == null
+                ? '${widget.initialLocation.latitude.toStringAsFixed(3)}, ${widget.initialLocation.longitude.toStringAsFixed(3)}'
+                : '${_selectedLocation?.latitude.toStringAsFixed(3)},  ${_selectedLocation?.longitude.toStringAsFixed(3)}'),
+          ),
+        ),
+        actions: [
+          if (widget.isSelecting)
+            IconButton(
+                onPressed: _selectedLocation == null ? null : _confirmPosition,
+                icon: Icon(Icons.check_box))
+        ],
       ),
       body: GoogleMap(
         markers: _selectedLocation == null

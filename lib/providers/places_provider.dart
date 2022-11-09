@@ -11,21 +11,27 @@ class Places with ChangeNotifier {
     return [..._items];
   }
 
+  Place findById(String id) {
+    return _items.firstWhere((element) => element.id == id);
+  }
+
   void addItem(
       {required String title,
-      required double latitude,
-      required double longitude,
+      required PlaceLocation location,
       required File image}) async {
     final newPlace = Place(
         id: DateTime.now().toString(),
         title: title,
-        location: PlaceLocation(latitude: latitude, longitude: longitude),
+        location: location,
         image: image);
     _items.add(newPlace);
     await DbHelper.insert('places', {
       'id': newPlace.id,
       'title': newPlace.title,
-      'image': newPlace.image.path
+      'image': newPlace.image.path,
+      'loc_lat': location.latitude,
+      'loc_lon': location.longitude,
+      'address': location.address.toString()
     });
     notifyListeners();
   }
@@ -37,7 +43,10 @@ class Places with ChangeNotifier {
         .map((e) => Place(
             id: e['id'] as String,
             title: e['title'] as String,
-            location: PlaceLocation(latitude: 10.0, longitude: 10.0),
+            location: PlaceLocation(
+                latitude: e['loc_lat'] as double,
+                longitude: e['loc_lon'] as double,
+                address: e['address'] as String),
             image: File(e['image'] as String)))
         .toList();
     notifyListeners();

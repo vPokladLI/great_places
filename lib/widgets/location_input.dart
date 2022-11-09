@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../helpers/maps_helper.dart';
 import '../pages/map_screen.dart';
+import '../models/place.dart';
 
 class LocationInput extends StatefulWidget {
   final Function selectLocation;
@@ -13,14 +15,17 @@ class LocationInput extends StatefulWidget {
 }
 
 class _LocationInputState extends State<LocationInput> {
-  Location location = Location();
+  var _isLoading = false;
   String? _previewLocation;
-
   late bool _serviceEnabled;
   late PermissionStatus _permissionGranted;
-  late LocationData _locationData;
+  LatLng? _locationData;
 
+  Location location = Location();
   Future<void> _getLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
@@ -50,18 +55,21 @@ class _LocationInputState extends State<LocationInput> {
         return;
       }
     }
-    _locationData = await location.getLocation();
-    // if (_locationData == null) return;
+    LocationData locationData = await location.getLocation();
+    if (locationData == null) return;
+    _locationData = LatLng(locationData.latitude!, locationData.longitude!);
     final mapImageUrl = MapsHelper.generateLocationPreview(
-        _locationData.latitude!, _locationData.longitude!);
+        locationData.latitude!, locationData.longitude!);
     widget.selectLocation(_locationData);
     setState(() {
+      _isLoading = false;
       _previewLocation = mapImageUrl;
     });
   }
 
   Future<void> _selectOnMap() async {
-    final selectedLocation = await Navigator.of(context).push(MaterialPageRoute(
+    final LatLng? selectedLocation =
+        await Navigator.of(context).push(MaterialPageRoute(
       fullscreenDialog: true,
       builder: (context) => const MapScreen(
         isSelecting: true,
@@ -70,6 +78,16 @@ class _LocationInputState extends State<LocationInput> {
     if (selectedLocation == null) {
       return;
     }
+    setState(() {
+      _isLoading = true;
+    });
+    final mapImageUrl = MapsHelper.generateLocationPreview(
+        selectedLocation.latitude, selectedLocation.longitude);
+    setState(() {
+      _isLoading = false;
+      _previewLocation = mapImageUrl;
+    });
+    widget.selectLocation(selectedLocation);
   }
 
   @override
@@ -82,16 +100,18 @@ class _LocationInputState extends State<LocationInput> {
           height: 200,
           decoration: BoxDecoration(
               border: Border.all(color: Colors.black12, width: 1)),
-          child: _previewLocation == null
-              ? const Text(
-                  'No location is selected',
-                  textAlign: TextAlign.center,
-                )
-              : Image.network(
-                  _previewLocation as String,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+          child: _isLoading
+              ? const CircularProgressIndicator()
+              : _previewLocation == null
+                  ? const Text(
+                      'No location is selected',
+                      textAlign: TextAlign.center,
+                    )
+                  : Image.network(
+                      _previewLocation as String,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
         ),
         const SizedBox(
           height: 10,

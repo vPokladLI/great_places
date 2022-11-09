@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/maps_helper.dart';
+
 import '../providers/places_provider.dart';
+import '../models/place.dart';
 import '../widgets/image_input.dart';
 import '../widgets/location_input.dart';
 
@@ -18,14 +22,20 @@ class AddPlaceScreen extends StatefulWidget {
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
   File? _pickedImage;
-  LocationData? _selectedLocation;
+  PlaceLocation? _selectedLocation;
 
   void selectImage(File pickedImage) {
     _pickedImage = pickedImage;
   }
 
-  void selectLocation(LocationData location) {
-    _selectedLocation = location;
+  void selectLocation(LatLng location) async {
+    final address = await MapsHelper.generateAddressFromLocation(
+        location.latitude, location.longitude);
+
+    _selectedLocation = PlaceLocation(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        address: address as String);
   }
 
   void _onSubmit() {
@@ -36,8 +46,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
     }
     context.read<Places>().addItem(
         title: _titleController.text,
-        latitude: _selectedLocation!.latitude as double,
-        longitude: _selectedLocation!.longitude as double,
+        location: _selectedLocation!,
         image: _pickedImage!);
 
     Navigator.of(context).pop();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../pages/add_place_screen.dart';
+import '../pages/detailed_place_screen.dart';
 import '../providers/places_provider.dart';
 
 class PlacesScreen extends StatelessWidget {
@@ -125,8 +126,12 @@ class PlacesScreen extends StatelessWidget {
                               backgroundImage: FileImage(places.items[i].image),
                             ),
                             title: Text(places.items[i].title),
+                            subtitle: Text(places.items[i].location.address),
                             onTap: () {
-                              //TODO implement detailed view
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => DetailedPageScreen(
+                                    placeId: places.items[i].id),
+                              ));
                             },
                             trailing: IconButton(
                                 onPressed: () {
