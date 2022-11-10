@@ -4,7 +4,6 @@ import 'package:location/location.dart';
 
 import '../helpers/maps_helper.dart';
 import '../pages/map_screen.dart';
-import '../models/place.dart';
 
 class LocationInput extends StatefulWidget {
   final Function selectLocation;
@@ -56,7 +55,7 @@ class _LocationInputState extends State<LocationInput> {
       }
     }
     LocationData locationData = await location.getLocation();
-    if (locationData == null) return;
+
     _locationData = LatLng(locationData.latitude!, locationData.longitude!);
     final mapImageUrl = MapsHelper.generateLocationPreview(
         locationData.latitude!, locationData.longitude!);
@@ -71,7 +70,8 @@ class _LocationInputState extends State<LocationInput> {
     final LatLng? selectedLocation =
         await Navigator.of(context).push(MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (context) => const MapScreen(
+      builder: (context) => MapScreen(
+        initialLocation: _locationData ?? const LatLng(49, 32),
         isSelecting: true,
       ),
     ));

@@ -78,7 +78,7 @@ class PlacesScreen extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
+                              children: const [
                                 Text(
                                   'DELETE',
                                   style: TextStyle(

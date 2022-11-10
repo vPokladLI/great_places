@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/maps_helper.dart';
@@ -83,7 +82,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                       height: 16,
                     ),
                     ImageInput(selectImage),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     LocationInput(selectLocation),
